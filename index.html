@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MICRO-SP2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-purple: #bc13fe;
+            --neon-green: #0ff0fc;
+            --neon-pink: #ff44cc;
+            --neon-blue: #4d4dff;
+            --neon-orange: #ff5e1a;
+            --dark-bg: #0a0a0a;
+            --dark-card: #151515;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .neon-title {
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px var(--neon-purple), 0 0 20px var(--neon-purple);
+            color: var(--text-primary);
+        }
+
+        .neon-border {
+            border: 1px solid var(--neon-purple);
+            box-shadow: 0 0 5px var(--neon-purple), inset 0 0 5px var(--neon-purple);
+        }
+
+        .neon-button {
+            background-color: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .neon-button:hover {
+            background-color: var(--neon-green);
+            color: var(--dark-bg);
+            box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
+        }
+
+        .neon-button.active {
+            background-color: var(--neon-green);
+            color: var(--dark-bg);
+            box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
+        }
+
+        .nav-link {
+            position: relative;
+            padding: 8px 16px;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--neon-pink);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+            box-shadow: 0 0 8px var(--neon-pink);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-primary);
+        }
+
+        .section-card {
+            background-color: var(--dark-card);
+            border-radius: 8px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-blue), var(--neon-green), var(--neon-pink));
+            opacity: 0.7;
+        }
+
+        .cycle-stage {
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .cycle-stage:hover, .cycle-stage.active {
+            background-color: rgba(188, 19, 254, 0.1);
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 8px var(--neon-purple);
+            color: var(--text-primary);
+        }
+
+        .morpho-vis-container {
+            min-height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            position: relative;
+        }
+
+        .morpho-vis-container::before {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            right: 1px;
+            bottom: 1px;
+            border: 1px solid var(--neon-blue);
+            border-radius: 8px;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .parasite-svg {
+            width: 100%;
+            height: 100%;
+            transition: all 0.5s ease;
+        }
+
+        .animated {
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% {
+                filter: drop-shadow(0 0 2px var(--neon-green));
+            }
+            100% {
+                filter: drop-shadow(0 0 8px var(--neon-green));
+            }
+        }
+
+        .stage-arrow {
+            color: var(--neon-green);
+            text-shadow: 0 0 5px var(--neon-green);
+            margin: 8px 0;
+        }
+
+        .glow-text {
+            text-shadow: 0 0 5px currentColor;
+        }
+
+        .content-hidden {
+            display: none;
+        }
+
+        .content-visible {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .phase-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .phase-card:hover {
+            background-color: rgba(188, 19, 254, 0.1);
+            box-shadow: 0 0 10px rgba(188, 19, 254, 0.5);
+            color: var(--text-primary);
+        }
+
+        .consequence-item {
+            position: relative;
+            padding-left: 24px;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+        }
+
+        .consequence-item::before {
+            content: '➤';
+            position: absolute;
+            left: 0;
+            color: var(--neon-pink);
+            text-shadow: 0 0 5px var(--neon-pink);
+        }
+
+        .cyst-visual {
+            width: 180px;
+            height: 180px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .interactive-svg {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .interactive-svg:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 5px var(--neon-green));
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: rgba(10, 10, 10, 0.9);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            max-width: 200px;
+            font-size: 14px;
+        }
+
+        .svg-container {
+            position: relative;
+        }
+
+        .svg-container:hover .tooltip {
+            opacity: 1;
+        }
+
+        .info-panel {
+            background-color: var(--dark-card);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 5px var(--neon-blue), inset 0 0 5px var(--neon-blue);
+            color: var(--text-secondary);
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Estilos do Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            overflow: auto;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: var(--dark-card);
+            margin: 5% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px var(--neon-purple);
+            animation: modalFadeIn 0.3s;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            color: var(--neon-pink);
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close-modal:hover {
+            color: var(--neon-green);
+            transform: scale(1.2);
+        }
+
+        .modal-illustration {
+            width: 100%;
+            max-height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-illustration svg {
+            max-width: 100%;
+            max-height: 400px;
+        }
+
+        .modal-description {
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border-left: 3px solid var(--neon-green);
+        }
+
+        .modal-title {
+            color: var(--neon-green);
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-[#0a0a0a]/90 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-[#bc13fe]/30">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold neon-title">Explorador de Parasitologia</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#intro" class="nav-link text-sm font-semibold">Introdução</a>
+                        <a href="#chagas" class="nav-link text-sm font-semibold">Doença de Chagas</a>
+                        <a href="#esquisto" class="nav-link text-sm font-semibold">Esquistossomose</a>
+                        <a href="#cisti" class="nav-link text-sm font-semibold">Cisticercose</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <section id="intro" class="my-12">
+            <h2 class="text-3xl font-bold text-center mb-2 neon-title">Introdução aos Parasitos</h2>
+            <p class="text-center text-lg text-[#cccccc] mb-8">Compreenda as diferenças fundamentais entre os principais grupos de parasitos humanos.</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="section-card">
+                    <h3 class="text-2xl font-semibold mb-3 text-center glow-text" style="color: var(--neon-green);">Protozoários</h3>
+                    <p class="text-[#cccccc]">Organismos eucariontes e unicelulares.</p>
+                    <ul class="space-y-2 list-disc list-inside mt-3 text-[#cccccc]">
+                        <li>Reprodução pode ser intra ou extracelular.</li>
+                        <li>Transmissão por vetores (insetos), via oral-fecal ou sexual.</li>
+                    </ul>
+                    <div class="mt-4 morpho-vis-container svg-container">
+                        <svg class="parasite-svg interactive-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" 
+                             onmouseover="showTooltip(event, 'Protozoários: organismos unicelulares com estruturas especializadas para movimento e alimentação.')" 
+                             onclick="zoomIllustration(this, 'Protozoários', 'Organismos unicelulares com estruturas especializadas para movimento e alimentação. Podem ter flagelos, cílios ou pseudópodes para locomoção.')">
+                            <circle cx="50" cy="50" r="25" fill="none" stroke="var(--neon-green)" stroke-width="2" class="animated"/>
+                            <circle cx="50" cy="50" r="5" fill="var(--neon-green)" />
+                            <path d="M50 25 L65 40 M50 25 L35 40" stroke="var(--neon-green)" stroke-width="1.5"/>
+                            <path d="M50 75 L65 60 M50 75 L35 60" stroke="var(--neon-green)" stroke-width="1.5"/>
+                        </svg>
+                        <div class="tooltip">Clique para ampliar</div>
+                    </div>
+                </div>
+                <div class="section-card">
+                    <h3 class="text-2xl font-semibold mb-3 text-center glow-text" style="color: var(--neon-pink);">Helmintos</h3>
+                    <p class="text-[#cccccc]">Organismos eucariontes e multicelulares (vermes).</p>
+                    <ul class="space-y-2 list-disc list-inside mt-3 text-[#cccccc]">
+                        <li>Ciclo de vida complexo com reprodução sexuada e assexuada.</li>
+                        <li>Transmissão por via oral-fecal, vetores ou invasão direta da pele.</li>
+                    </ul>
+                    <div class="mt-4 morpho-vis-container svg-container">
+                        <svg class="parasite-svg interactive-svg" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg"
+                             onmouseover="showTooltip(event, 'Helmintos: vermes parasitas com corpo alongado e adaptações para fixação no hospedeiro.')" 
+                             onclick="zoomIllustration(this, 'Helmintos', 'Vermes parasitas com corpo alongado e adaptações para fixação no hospedeiro. Podem ser achatados (platelmintos) ou cilíndricos (nematelmintos).')">
+                            <path d="M10 25 Q30 10, 50 25 T90 25" fill="none" stroke="var(--neon-pink)" stroke-width="3" class="animated"/>
+                            <circle cx="20" cy="25" r="3" fill="var(--neon-pink)" />
+                            <circle cx="80" cy="25" r="3" fill="var(--neon-pink)" />
+                        </svg>
+                        <div class="tooltip">Clique para ampliar</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="chagas" class="my-24">
+            <h2 class="text-3xl font-bold text-center mb-2 neon-title">Doença de Chagas</h2>
+            <p class="text-center text-lg text-[#cccccc] mb-8">Causada pelo protozoário <i>Trypanosoma cruzi</i> e transmitida pelo inseto "barbeiro".</p>
+            
+            <div class="section-card mb-8">
+                <h3 class="text-2xl font-semibold mb-4 text-center glow-text" style="color: var(--neon-purple);">Ciclo de Vida e Morfologia do <i>T. cruzi</i></h3>
+                <p class="text-center mb-6 text-[#cccccc]">O ciclo envolve o hospedeiro humano e o inseto vetor, com diferentes formas do parasito. Clique em cada estágio para ver os detalhes e uma representação visual precisa.</p>
+                <div class="grid lg:grid-cols-2 gap-6 items-center">
+                    <div class="flex flex-col items-center">
+                        <div id="chagas-stage-1" class="cycle-stage w-full text-center" onclick="showChagasInfo(1)">1. Picada e Infecção</div>
+                        <div class="stage-arrow text-2xl">↓</div>
+                        <div id="chagas-stage-2" class="cycle-stage w-full text-center" onclick="showChagasInfo(2)">2. Invasão Celular</div>
+                        <div class="stage-arrow text-2xl">↓</div>
+                        <div id="chagas-stage-3" class="cycle-stage w-full text-center" onclick="showChagasInfo(3)">3. Multiplicação e Rompimento</div>
+                        <div class="stage-arrow text-2xl">↓</div>
+                        <div id="chagas-stage-4" class="cycle-stage w-full text-center" onclick="showChagasInfo(4)">4. Inseto se Infecta</div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div id="chagas-morpho-container" class="morpho-vis-container svg-container">
+                            <!-- Conteúdo será preenchido via JavaScript -->
+                        </div>
+                        <div id="chagas-info-panel" class="info-panel">
+                            <h4 id="chagas-info-title" class="text-xl font-bold mb-2 glow-text" style="color: var(--neon-green);">Detalhes do Estágio</h4>
+                            <p id="chagas-info-text" class="text-[#cccccc]">Selecione um estágio do ciclo para ler a descrição aqui.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-card">
+                <h3 class="text-2xl font-semibold mb-4 text-center glow-text" style="color: var(--neon-purple);">Fases e Morfologia da Doença</h3>
+                <p class="text-center mb-6 text-[#cccccc]">A doença progride de uma fase aguda para uma crônica, dengan manifestações morfológicas distintas e graves.</p>
+                <div class="flex justify-center space-x-4 mb-6">
+                    <button id="btn-chagas-aguda" class="neon-button" onclick="showChagasPhase('aguda')">Fase Aguda</button>
+                    <button id="btn-chagas-cronica" class="neon-button" onclick="showChagasPhase('cronica')">Fase Crônica</button>
+                </div>
+                
+                <div id="chagas-aguda-content" class="content-hidden">
+                    <p class="mb-4 text-[#cccccc]">Nesta fase, as manifestações são agudas e no local da infecção.</p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="phase-card svg-container" onmouseover="showTooltip(event, 'Sinal de Romanã: edema bipalpebral unilateral.')">
+                            <h4 class="font-bold text-lg glow-text" style="color: var(--neon-blue);">Sinal de Romanã</h4>
+                            <p class="text-sm mt-1 text-[#cccccc]">Edema bipalpebral unilateral e indolor (quando na conjuntiva). Uma reação inflamatória no local da entrada do parasito.</p>
+                            <div class="mt-3 flex justify-center">
+                                <svg width="80" height="60" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Sinal de Romanã', 'Edema bipalpebral unilateral resultante da porta de entrada conjuntival do parasito. Representa uma reação inflamatória local à infecção.')">
+                                    <circle cx="50" cy="40" r="35" fill="none" stroke="var(--neon-blue)" stroke-width="2"/>
+                                    <circle cx="35" cy="30" r="10" fill="none" stroke="var(--neon-blue)" stroke-width="2" stroke-dasharray="4,4"/>
+                                    <circle cx="65" cy="30" r="8" fill="none" stroke="var(--neon-blue)" stroke-width="2"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="phase-card svg-container" onmouseover="showTooltip(event, 'Chagoma de Inoculação: lesão cutânea no local da picada.')">
+                            <h4 class="font-bold text-lg glow-text" style="color: var(--neon-blue);">Chagoma de Inoculação</h4>
+                            <p class="text-sm mt-1 text-[#cccccc]">Lesão cutânea nodular e endurecida no local da picada, representando uma reação inflamatória local intensa.</p>
+                            <div class="mt-3 flex justify-center">
+                                <svg width="80" height="60" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Chagoma de Inoculação', 'Lesão cutânea característica no local da picada do barbeiro, com inflamação intensa e presença de parasitos.')">
+                                    <circle cx="50" cy="40" r="30" fill="none" stroke="var(--neon-blue)" stroke-width="2"/>
+                                    <circle cx="50" cy="40" r="15" fill="none" stroke="var(--neon-blue)" stroke-width="3"/>
+                                    <circle cx="50" cy="40" r="8" fill="var(--neon-blue)" opacity="0.7"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="chagas-cronica-content" class="content-hidden">
+                    <p class="text-center mb-4 text-[#cccccc]">Após anos, a persistência do parasito leva à destruição de células e à fibrose, especialmente no coração e no trato digestivo.</p>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="phase-card svg-container" onmouseover="showTooltip(event, 'Cardiomiopatia Chagásica: coração aumentado com fibrose.')">
+                            <h4 class="font-bold text-lg glow-text" style="color: var(--neon-pink);">Cardiomiopatia Chagásica</h4>
+                            <p class="text-sm mt-1 text-[#cccccc]">Coração aumentado de volume, flácido. Fibrose e substituição das células musculares por tecido conjuntivo.</p>
+                            <div class="mt-3 flex justify-center">
+                                <svg width="80" height="60" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Cardiomiopatia Chagásica', 'Alteração cardíaca caracterizada por dilatação das cavidades, afinamento da parede ventricular e fibrose intersticial focal.')">
+                                    <path d="M50,30 C70,20 80,40 70,60 C60,70 40,70 30,60 C20,40 30,20 50,30 Z" fill="none" stroke="var(--neon-pink)" stroke-width="2"/>
+                                    <path d="M40,40 L60,40 M40,50 L60,50" stroke="var(--neon-pink)" stroke-width="1.5"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="phase-card svg-container" onmouseover="showTooltip(event, 'Megaesôfago: dilatação do esôfago.')">
+                            <h4 class="font-bold text-lg glow-text" style="color: var(--neon-pink);">Megaesôfago</h4>
+                            <p class="text-sm mt-1 text-[#cccccc]">Dilatação do esôfago devido à destruição dos plexos nervosos, causando dificuldade de engolir (disfagia).</p>
+                            <div class="mt-3 flex justify-center">
+                                <svg width="80" height="60" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Megaesôfago', 'Dilatação esofágica com hipertrofia da musculatura lisa e degeneração do plexo nervoso intramural.')">
+                                    <path d="M30,20 L70,20 L75,40 L70,60 L30,60 L25,40 Z" fill="none" stroke="var(--neon-pink)" stroke-width="2"/>
+                                    <path d="M40,30 L60,30 M40,40 L60,40 M40,50 L60,50" stroke="var(--neon-pink)" stroke-width="1.5"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="phase-card svg-container" onmouseover="showTooltip(event, 'Megacólon: dilatação do intestino grosso.')">
+                            <h4 class="font-bold text-lg glow-text" style="color: var(--neon-pink);">Megacólon</h4>
+                            <p class="text-sm mt-1 text-[#cccccc]">Dilatação do intestino grosso pela mesma causa, com acúmulo de fezes e constipação severa.</p>
+                            <div class="mt-3 flex justify-center">
+                                <svg width="80" height="60" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Megacólon', 'Dilatação do cólon com hipertrofia da muscular própria e degeneração do plexo nervoso de Auerbach.')">
+                                    <path d="M20,30 C30,20 70,20 80,30 C90,40 90,60 80,70 C70,80 30,80 20,70 C10,60 10,40 20,30 Z" fill="none" stroke="var(--neon-pink)" stroke-width="2"/>
+                                    <path d="M30,40 L70,40 M30,50 L70,50" stroke="var(--neon-pink)" stroke-width="1.5"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="esquisto" class="my-24">
+            <h2 class="text-3xl font-bold text-center mb-2 neon-title">Esquistossomose</h2>
+            <p class="text-center text-lg text-[#cccccc] mb-8">Causada pelo helminto <i>Schistosoma mansoni</i>, com um ciclo complexo envolvendo caramujos e humanos.</p>
+            
+            <div class="section-card mb-8">
+                <h3 class="text-2xl font-semibold mb-4 text-center glow-text" style="color: var(--neon-green);">Ciclo de Vida e Morfologia do <i>S. mansoni</i></h3>
+                <p class="text-center mb-6 text-[#cccccc]">A patologia principal não é causada pelo verme adulto, mas sim pela reação do corpo aos ovos. Clique nos estágios para ver a descrição e uma representação detalhada da forma morfológica.</p>
+                <div class="grid lg:grid-cols-2 gap-6 items-center">
+                    <div class="flex flex-col items-center">
+                        <div id="schisto-stage-1" class="cycle-stage w-full text-center" onclick="showSchistoInfo(1)">1. Ovos eliminados nas fezes</div>
+                        <div class="stage-arrow text-2xl">↓</div>
+                        <div id="schisto-stage-2" class="cycle-stage w-full text-center" onclick="showSchistoInfo(2)">2. Infecção do caramujo</div>
+                        <div class="stage-arrow text-2xl">↓</div>
+                        <div id="schisto-stage-3" class="cycle-stage w-full text-center" onclick="showSchistoInfo(3)">3. Penetração na pele humana</div>
+                        <div class="stage-arrow text-2xl">↓</div>
+                        <div id="schisto-stage-4" class="cycle-stage w-full text-center" onclick="showSchistoInfo(4)">4. Vermes adultos e ovos</div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div id="schisto-morpho-container" class="morpho-vis-container svg-container">
+                            <!-- Conteúdo será preenchido via JavaScript -->
+                        </div>
+                        <div id="schisto-info-panel" class="info-panel">
+                            <h4 id="schisto-info-title" class="text-xl font-bold mb-2 glow-text" style="color: var(--neon-green);">Detalhes do Estágio</h4>
+                            <p id="schisto-info-text" class="text-[#cccccc]">Selecione um estágio do ciclo para ler a descrição aqui.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <h3 class="text-2xl font-semibold mb-4 text-center glow-text" style="color: var(--neon-green);">Patogenia e Morfologia</h3>
+                <p class="text-center mb-6 text-[#cccccc]">A resposta inflamatória aos ovos, chamada de granuloma, leva à fibrose e a graves consequências no fígado.</p>
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="font-bold text-lg mb-2 glow-text" style="color: var(--neon-blue);">Formação do Granuloma</h4>
+                        <p class="text-[#cccccc]">É uma tentativa do sistema imune de isolar o ovo. Macrófagos se transformam em células epitelioides e gigantes, cercados por linfócitos e eosinófilos. Com o tempo, o granuloma é substituído por tecido fibroso (cicatriz).</p>
+                        <p class="text-sm mt-2 text-[#cccccc]"><strong>Morfologia Microscópica:</strong> </p>
+                        <div class="mt-4 morpho-vis-container svg-container">
+                            <svg width="100%" height="100" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Granuloma Esquistossomótico', 'Reação granulomatosa ao redor de ovo de Schistosoma mansoni, com células epitelioides, células gigantes e infiltrado inflamatório.')">
+                                <circle cx="100" cy="50" r="40" fill="none" stroke="var(--neon-blue)" stroke-width="2" stroke-dasharray="4,4"/>
+                                <circle cx="100" cy="50" r="10" fill="var(--neon-blue)" opacity="0.5"/>
+                                <circle cx="80" cy="40" r="5" fill="var(--neon-green)"/>
+                                <circle cx="120" cy="40" r="5" fill="var(--neon-green)"/>
+                                <circle cx="90" cy="60" r="5" fill="var(--neon-green)"/>
+                                <circle cx="110" cy="60" r="5" fill="var(--neon-green)"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-lg mt-4 mb-2 glow-text" style="color: var(--neon-blue);">Morfologia Intestinal</h4>
+                        <p class="text-[#cccccc]">Na fase aguda, pode haver edema, ulcerações e sangramento. Na fase crônica, a inflamação pode levar à formação de pólipos.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg mb-2 glow-text" style="color: var(--neon-blue);">Fibrose Hepática e Hipertensão Portal</h4>
+                        <p class="text-[#cccccc]">No fígado, a fibrose se forma nos espaços porta, ao redor dos ramos da veia porta, obstruindo o fluxo sanguíneo. Essa fibrose característica é chamada de <strong>"fibrose em haste de cachimbo de barro"</strong> (Symmers). A obstrução aumenta a pressão na veia porta, causando consequências sistêmicas graves.</p>
+                        <div class="chart-container mt-4">
+                            <canvas id="hypertensionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cisti" class="my-24">
+            <h2 class="text-3xl font-bold text-center mb-2 neon-title">Cisticercose</h2>
+            <p class="text-center text-lg text-[#cccccc] mb-8">Infecção causada pela larva da <i>Taenia solium</i>, geralmente afetando o sistema nervoso central.</p>
+
+            <div class="section-card mb-8">
+                <h3 class="text-2xl font-semibold mb-4 text-center glow-text" style="color: var(--neon-pink);">Teníase vs. Cisticercose</h3>
+                <p class="text-center mb-6 text-[#cccccc]">É crucial diferenciar os dois ciclos. A <strong>Teníase</strong> é a infecção pelo verme adulto no intestino (ingerindo carne de porco crua com cisticerco). A <strong>Cisticercose</strong> é a infecção pela larva nos tecidos (ingerindo os ovos do verme).</p>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="flex flex-col items-center">
+                        <p class="font-bold text-lg mb-2 glow-text" style="color: var(--neon-green);">Teníase</p>
+                        <div class="w-full flex justify-center items-center p-4 bg-[#151515] rounded-lg neon-border svg-container" onmouseover="showTooltip(event, 'Teníase: verme adulto no intestino humano.')">
+                            <svg width="180" height="100" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Teníase', 'Verme adulto de Taenia solium no intestino delgado, com escólex com ventosas e ganchos, e proglotes grávidas.')">
+                                <rect x="10" y="40" width="180" height="20" rx="10" fill="none" stroke="var(--neon-green)" stroke-width="2"/>
+                                <circle cx="30" cy="50" r="8" fill="var(--neon-green)" opacity="0.7"/>
+                                <circle cx="170" cy="50" r="8" fill="var(--neon-green)" opacity="0.7"/>
+                                <path d="M50 50 Q70 30, 90 50 T130 50 T170 50" fill="none" stroke="var(--neon-green)" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <p class="text-sm mt-2 text-[#cccccc]">O homem é o hospedeiro definitivo, com o verme adulto no intestino. A infecção ocorre ao ingerir carne contaminada.</p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <p class="font-bold text-lg mb-2 glow-text" style="color: var(--neon-pink);">Cisticercose</p>
+                        <div class="w-full flex justify-center items-center p-4 bg-[#151515] rounded-lg neon-border svg-container" onmouseover="showTooltip(event, 'Cisticercose: larvas nos tecidos humanos.')">
+                            <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Cisticerco', 'Larva cística com escólex invaginado, contendo ventosas e dupla coroa de ganchos.')">
+                                <circle cx="60" cy="60" r="50" fill="none" stroke="var(--neon-pink)" stroke-width="2"/>
+                                <circle cx="60" cy="60" r="15" fill="var(--neon-pink)" opacity="0.5"/>
+                                <circle cx="60" cy="60" r="5" fill="var(--neon-pink)"/>
+                            </svg>
+                        </div>
+                        <p class="text-sm mt-2 text-[#cccccc]">O homem é o hospedeiro intermediário, com larvas (cisticercos) nos tecidos. A infecção ocorre ao ingerir ovos.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <h3 class="text-2xl font-semibold mb-4 text-center glow-text" style="color: var(--neon-pink);">Neurocisticercose: A Evolução do Cisto</h3>
+                <p class="text-center mb-6 text-[#cccccc]">No cérebro, o cisticerco passa por fases de evolução que determinam a reação inflamatória e os sintomas. Clique nas fases para ver a progressão e sua representação visual.</p>
+                <div class="flex flex-wrap justify-center gap-2 mb-6">
+                    <button id="btn-cisto-1" class="neon-button" onclick="showCystStage(1)">1. Vesicular</button>
+                    <button id="btn-cisto-2" class="neon-button" onclick="showCystStage(2)">2. Coloidal</button>
+                    <button id="btn-cisto-3" class="neon-button" onclick="showCystStage(3)">3. Granular</button>
+                    <button id="btn-cisto-4" class="neon-button" onclick="showCystStage(4)">4. Calcificado</button>
+                </div>
+                <div class="grid lg:grid-cols-2 gap-6 items-center">
+                    <div id="cyst-visual-container" class="morpho-vis-container svg-container">
+                        <div id="cyst-image-vis" class="cyst-visual"></div>
+                    </div>
+                    <div id="cyst-info-panel" class="info-panel">
+                        <h4 id="cyst-info-title" class="text-xl font-bold mb-2 glow-text" style="color: var(--neon-pink);">Detalhes da Fase</h4>
+                        <p id="cyst-info-text" class="text-[#cccccc]">Selecione uma fase para ver a descrição morfológica e a reação do hospedeiro.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-[#0a0a0a] border-t border-[#bc13fe]/30 mt-12">
+        <div class="container mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-[#cccccc]">
+            <p>Conteúdo adaptado do material de Morfologia - SP3. Finalidade educacional.</p>
+        </div>
+    </footer>
+
+    <!-- Modal para zoom de ilustrações -->
+    <div id="illustration-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-modal">&times;</span>
+            <h2 id="modal-title" class="modal-title text-center"></h2>
+            <div id="modal-illustration" class="modal-illustration"></div>
+            <div id="modal-description" class="modal-description">
+                <p id="modal-text" class="text-[#cccccc]"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados para as visualizações
+        const chagasData = {
+            1: { 
+                title: 'Tripomastigota Metacíclico', 
+                text: 'Esta é a forma infectante, liberada nas fezes do barbeiro. É alongada, com um cinetoplasto (estrutura contendo DNA mitocondrial) na extremidade posterior e membrana ondulante.',
+                morphoVis: `<svg width="100%" height="160" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Tripomastigota Metacíclico', 'Forma infectante alongada com flagelo livre, cinetoplasto posterior e membrana ondulante. Mede aproximadamente 20μm de comprimento.')">
+                    <path d="M40 80 C60 60, 140 60, 160 80 C180 100, 140 120, 120 100 L160 80 L140 60" fill="none" stroke="var(--neon-purple)" stroke-width="3" class="animated"/>
+                    <circle cx="155" cy="75" r="5" fill="var(--neon-purple)"/>
+                    <circle cx="45" cy="85" r="8" fill="var(--neon-purple)" opacity="0.5"/>
+                </svg>`
+            },
+            2: { 
+                title: 'Amastigota', 
+                text: 'Dentro das células do hospedeiro (principalmente músculo e nervos), o tripomastigota se transforma nessa forma arredondada e não flagelada para se multiplicar. É a fase de replicação intracelular.',
+                morphoVis: `<svg width="100%" height="160" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Amastigota', 'Forma arredondada intracelular, com aproximadamente 2-4μm de diâmetro, sem flagelo externo visível. Multiplica-se por divisão binária.')">
+                    <circle cx="100" cy="80" r="30" fill="none" stroke="var(--neon-purple)" stroke-width="2" class="animated"/>
+                    <circle cx="100" cy="80" r="10" fill="var(--neon-purple)"/>
+                    <circle cx="90" cy="75" r="2" fill="white"/>
+                    <circle cx="110" cy="75" r="2" fill="white"/>
+                </svg>`
+            },
+            3: {
+                title: 'Ninho de Amastigotas',
+                text: 'A intensa multiplicação dos amastigotas dentro da célula hospedeira leva à sua ruptura. Eles então se diferenciam novamente em tripomastigotas, prontos para infectar novas células.',
+                morphoVis: `<svg width="100%" height="160" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Ninho de Amastigotas', 'Agregado intracelular de formas amastigotas em multiplicação, resultando na distensão e ruptura da célula hospedeira.')">
+                    <circle cx="100" cy="80" r="40" fill="none" stroke="var(--neon-purple)" stroke-width="2" class="animated"/>
+                    <circle cx="80" cy="70" r="8" fill="var(--neon-purple)" opacity="0.7"/>
+                    <circle cx="100" cy="60" r="8" fill="var(--neon-purple)" opacity="0.7"/>
+                    <circle cx="120" cy="70" r="8" fill="var(--neon-purple)" opacity="0.7"/>
+                    <circle cx="90" cy="90" r="8" fill="var(--neon-purple)" opacity="0.7"/>
+                    <circle cx="110" cy="90" r="8" fill="var(--neon-purple)" opacity="0.7"/>
+                </svg>`
+            },
+            4: {
+                title: 'Epimastigota no Vetor',
+                text: 'Esta forma é encontrada no intestino do barbeiro após ele ter se alimentado do sangue de um hospedeiro infectado. É aqui que o parasita se multiplica ativamente.',
+                morphoVis: `<svg width="100%" height="160" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Epimastigota', 'Forma alongada com cinetoplasto anterior ao núcleo e flagelo emergente, encontrada no intestino do vetor. Mede 25-30μm.')">
+                    <path d="M50 80 C70 60, 130 60, 150 80 C170 100, 130 120, 110 100 L150 80 L130 60" fill="none" stroke="var(--neon-purple)" stroke-width="3" class="animated"/>
+                    <circle cx="145" cy="75" r="5" fill="var(--neon-purple)"/>
+                    <circle cx="65" cy="85" r="8" fill="var(--neon-purple)" opacity="0.5"/>
+                </svg>`
+            }
+        };
+
+        const schistoData = {
+            1: {
+                title: 'Ovo',
+                text: 'O ovo de S. mansoni é o estágio diagnóstico, encontrado nas fezes. Possui um espinho lateral característico, essencial para a patogenia.',
+                morphoVis: `<svg width="100%" height="160" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Ovo de S. mansoni', 'Ovo elipsoide com espinho lateral característico, medindo aproximadamente 140μm por 60μm. Contém miracídio viável.')">
+                    <ellipse cx="100" cy="80" rx="30" ry="20" fill="none" stroke="var(--neon-green)" stroke-width="2" class="animated"/>
+                    <path d="M130 80 L150 70" stroke="var(--neon-green)" stroke-width="2"/>
+                    <circle cx="100" cy="80" r="5" fill="var(--neon-green)" opacity="0.7"/>
+                </svg>`
+            },
+            2: {
+                title: 'Miracídio',
+                text: 'O miracídio é a larva ciliada que eclode do ovo na água. Ele nada ativamente para encontrar e infectar o caramujo.',
+                morphoVis: `<svg width="100%" height="160" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Miracídio', 'Larva ciliada piriforme, com aproximadamente 150μm de comprimento. Apresenta células germinativas e glândulas de penetração.')">
+                    <circle cx="100" cy="80" r="25" fill="none" stroke="var(--neon-green)" stroke-width="2" class="animated"/>
+                    <circle cx="100" cy="80" r="8" fill="var(--neon-green)" opacity="0.7"/>
+                    <line x1="80" y1="70" x2="70" y2="60" stroke="var(--neon-green)" stroke-width="1"/>
+                    <line x1="90" y1="65" x2="80" y2="55" stroke="var(--neon-green)" stroke-width="1"/>
+                    <line x1="100" y1="60" x2="100" y2="50" stroke="var(--neon-green)" stroke-width="1"/>
+                    <line x1="110" y1="65" x2="120" y2="55" stroke="var(--neon-green)" stroke-width="1"/>
+                    <line x1="120" y1="70" x2="130" y2="60" stroke="var(--neon-green)" stroke-width="1"/>
+                </svg>`
+            },
+            3: {
+                title: 'Cercária',
+                text: 'As cercárias são liberadas pelo caramujo. Possuem uma cauda bifurcada que lhes permite nadar na água em busca de um hospedeiro humano, penetrando a pele ativamente.',
+                morphoVis: `<svg width="100%" height="160" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Cercária', 'Larva com corpo ovalado e cauda bifurcada, medindo aproximadamente 400μm. Possui glândulas de penetração e ventosa oral.')">
+                    <ellipse cx="100" cy="80" rx="20" ry="15" fill="none" stroke="var(--neon-green)" stroke-width="2" class="animated"/>
+                    <path d="M120 80 L160 60 M120 80 L160 100" stroke="var(--neon-green)" stroke-width="2"/>
+                    <circle cx="100" cy="80" r="5" fill="var(--neon-green)" opacity="0.7"/>
+                </svg>`
+            },
+            4: {
+                title: 'Verme Adulto',
+                text: 'O macho é menor e mais largo, com um canal ginecóforo onde a fêmea, mais longa e delgada, se abriga. Eles vivem emparelhados nas veias mesentéricas, onde a fêmea deposita os ovos.',
+                morphoVis: `<svg width="100%" height="160" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Schistosoma mansoni Adulto', 'Macho (6-10mm) com canal ginecóforo e fêmea (7-17mm) mais delgada. Vivem acasalados nas veias mesentéricas.')">
+                    <path d="M60 80 C80 60, 120 60, 140 80 C160 100, 120 120, 100 100" fill="none" stroke="var(--neon-green)" stroke-width="4" class="animated"/>
+                    <path d="M80 70 C100 50, 140 50, 160 70 C180 90, 140 110, 120 90" fill="none" stroke="var(--neon-green)" stroke-width="2"/>
+                </svg>`
+            }
+        };
+
+        const cystData = {
+            1: {
+                title: 'Fase Vesicular',
+                text: 'O cisto está viável, com parede fina e translúcida, e contém o escólex. Ele induz uma reação inflamatória mínima do hospedeiro.',
+                infoTitle: 'Reação Mínima',
+                infoText: 'O cisto está vivo e modula a resposta imune. Os pacientes são frequentemente assintomáticos, mas as lesões podem ser visualizadas por imagem (ex: tomografia).',
+                vis: `<svg width="100%" height="100%" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Cisto Vesicular', 'Cisto viável com líquido claro, parede fina e translúcida, e escólex invaginado. Mede 5-15mm. Não há inflamação significativa ao redor.')">
+                    <circle cx="100" cy="100" r="80" fill="none" stroke="var(--neon-pink)" stroke-width="2" class="animated"/>
+                    <circle cx="100" cy="100" r="30" fill="var(--neon-pink)" opacity="0.3"/>
+                    <circle cx="100" cy="100" r="10" fill="var(--neon-pink)"/>
+                </svg>`
+            },
+            2: {
+                title: 'Fase Coloidal',
+                text: 'Início da morte do cisticerco. O líquido interno fica turvo, e o escólex degenera. A parede do cisto se espessa, e há um processo inflamatório intenso ao redor.',
+                infoTitle: 'Inflamação Intensa',
+                infoText: 'A barreira do cisto se rompe, e o sistema imune reage intensamente. Há um grande edema ao redor do cisto, o que frequentemente causa crises convulsivas.',
+                vis: `<svg width="100%" height="100%" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Cisto Coloidal', 'Cisto em degeneração com líquido turvo, parede espessada e escólex em degeneração. Edema e inflamação intensa ao redor.')">
+                    <circle cx="100" cy="100" r="80" fill="none" stroke="var(--neon-pink)" stroke-width="3" class="animated"/>
+                    <circle cx="100" cy="100" r="50" fill="var(--neon-pink)" opacity="0.5"/>
+                    <circle cx="100" cy="100" r="15" fill="var(--neon-pink)" opacity="0.8"/>
+                    <circle cx="100" cy="100" r="70" fill="none" stroke="var(--neon-blue)" stroke-width="2" stroke-dasharray="4,4"/>
+                </svg>`
+            },
+            3: {
+                title: 'Fase Granular Nodular',
+                text: 'O cisto se retrai, a cápsula se espessa, e o conteúdo é reabsorvido, sendo substituído por tecido de granulação, formando um nódulo sólido. A inflamação diminui.',
+                infoTitle: 'Inflamação em Regressão',
+                infoText: 'A reação inflamatória e o edema diminuem gradualmente. O tecido cerebral inicia o processo de cicatrização (gliose) no local onde o cisto estava.',
+                vis: `<svg width="100%" height="100%" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Cisto Granular', 'Cisto retraído com cápsula espessada, substituído por tecido de granulação. Inflamação em regressão.')">
+                    <circle cx="100" cy="100" r="60" fill="none" stroke="var(--neon-pink)" stroke-width="3"/>
+                    <circle cx="100" cy="100" r="40" fill="var(--neon-pink)" opacity="0.7"/>
+                    <circle cx="100" cy="100" r="20" fill="var(--neon-pink)" opacity="0.9"/>
+                </svg>`
+            },
+            4: {
+                title: 'Fase Calcificada',
+                text: 'O cisto está completamente morto e mineralizado. É a "cicatriz" final, visível em exames de imagem como um foco branco e denso.',
+                infoTitle: 'Lesão Inativa',
+                infoText: 'O cisto está completamente morto e mineralizado. Geralmente não há inflamação, mas a calcificação pode servir como um foco irritativo, podendo ainda causar convulsões em alguns pacientes.',
+                vis: `<svg width="100%" height="100%" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="interactive-svg" onclick="zoomIllustration(this, 'Cisto Calcificado', 'Lesão mineralizada com deposição de sais de cálcio, representando a fase final de involução do cisticerco.')">
+                    <circle cx="100" cy="100" r="50" fill="none" stroke="var(--neon-pink)" stroke-width="2" stroke-dasharray="2,2"/>
+                    <circle cx="80" cy="80" r="5" fill="var(--neon-pink)"/>
+                    <circle cx="100" cy="70" r="5" fill="var(--neon-pink)"/>
+                    <circle cx="120" cy="90" r="5" fill="var(--neon-pink)"/>
+                    <circle cx="90" cy="110" r="5" fill="var(--neon-pink)"/>
+                    <circle cx="110" cy="120" r="5" fill="var(--neon-pink)"/>
+                    <circle cx="130" cy="110" r="5" fill="var(--neon-pink)"/>
+                </svg>`
+            }
+        };
+
+        // Funções de interatividade
+        function showTooltip(event, text) {
+            let tooltip = document.querySelector('.tooltip');
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                document.body.appendChild(tooltip);
+            }
+            
+            tooltip.textContent = text;
+            tooltip.style.left = (event.pageX + 10) + 'px';
+            tooltip.style.top = (event.pageY + 10) + 'px';
+            tooltip.style.opacity = '1';
+        }
+
+        function hideTooltip() {
+            const tooltip = document.querySelector('.tooltip');
+            if (tooltip) {
+                tooltip.style.opacity = '0';
+            }
+        }
+
+        function zoomIllustration(element, title, description) {
+            const modal = document.getElementById('illustration-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalIllustration = document.getElementById('modal-illustration');
+            const modalText = document.getElementById('modal-text');
+            
+            // Clonar o elemento SVG
+            const clone = element.cloneNode(true);
+            clone.style.width = '100%';
+            clone.style.height = 'auto';
+            clone.removeAttribute('onclick'); // Remover evento de clique para evitar recursão
+            
+            // Preencher o modal com informações
+            modalTitle.textContent = title;
+            modalText.textContent = description;
+            modalIllustration.innerHTML = '';
+            modalIllustration.appendChild(clone);
+            
+            // Exibir o modal
+            modal.style.display = 'block';
+        }
+
+        function showChagasInfo(stage) {
+            const data = chagasData[stage];
+            document.getElementById('chagas-info-title').textContent = data.title;
+            document.getElementById('chagas-info-text').textContent = data.text;
+            document.getElementById('chagas-morpho-container').innerHTML = data.morphoVis;
+            
+            document.querySelectorAll('.cycle-stage[id^="chagas-"]').forEach(el => el.classList.remove('active'));
+            document.getElementById(`chagas-stage-${stage}`).classList.add('active');
+        }
+
+        function showSchistoInfo(stage) {
+            const data = schistoData[stage];
+            document.getElementById('schisto-info-title').textContent = data.title;
+            document.getElementById('schisto-info-text').textContent = data.text;
+            document.getElementById('schisto-morpho-container').innerHTML = data.morphoVis;
+            
+            document.querySelectorAll('.cycle-stage[id^="schisto-"]').forEach(el => el.classList.remove('active'));
+            document.getElementById(`schisto-stage-${stage}`).classList.add('active');
+        }
+
+        function showChagasPhase(phase) {
+            const agudaContent = document.getElementById('chagas-aguda-content');
+            const cronicaContent = document.getElementById('chagas-cronica-content');
+            const agudaBtn = document.getElementById('btn-chagas-aguda');
+            const cronicaBtn = document.getElementById('btn-chagas-cronica');
+
+            if (phase === 'aguda') {
+                agudaContent.classList.remove('content-hidden');
+                agudaContent.classList.add('content-visible');
+                cronicaContent.classList.add('content-hidden');
+                cronicaContent.classList.remove('content-visible');
+                agudaBtn.classList.add('active');
+                cronicaBtn.classList.remove('active');
+            } else {
+                agudaContent.classList.add('content-hidden');
+                agudaContent.classList.remove('content-visible');
+                cronicaContent.classList.remove('content-hidden');
+                cronicaContent.classList.add('content-visible');
+                agudaBtn.classList.remove('active');
+                cronicaBtn.classList.add('active');
+            }
+        }
+
+        function showCystStage(stage) {
+            const data = cystData[stage];
+            document.getElementById('cyst-info-title').textContent = data.infoTitle;
+            document.getElementById('cyst-info-text').textContent = data.infoText;
+            document.getElementById('cyst-image-vis').innerHTML = data.vis;
+            
+            document.querySelectorAll('.neon-button[id^="btn-cisto-"]').forEach(el => el.classList.remove('active'));
+            document.getElementById(`btn-cisto-${stage}`).classList.add('active');
+        }
+
+        function renderHypertensionChart() {
+            const ctx = document.getElementById('hypertensionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Esplenomegalia', 'Varizes de Esôfago', 'Ascite'],
+                    datasets: [{
+                        label: 'Frequência das Complicações',
+                        data: [90, 65, 50],
+                        backgroundColor: [
+                            'rgba(188, 19, 254, 0.6)',
+                            'rgba(0, 240, 252, 0.6)',
+                            'rgba(255, 68, 204, 0.6)'
+                        ],
+                        borderColor: [
+                            'var(--neon-purple)',
+                            'var(--neon-green)',
+                            'var(--neon-pink)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Principais Consequências da Hipertensão Portal',
+                            color: 'var(--text-primary)'
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                color: 'var(--text-secondary)',
+                                callback: function(value) {
+                                    return value + '%'
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: 'var(--text-primary)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            showChagasInfo(1);
+            showChagasPhase('aguda');
+            showSchistoInfo(1);
+            showCystStage(1);
+            renderHypertensionChart();
+            
+            // Fechar modal
+            document.getElementById('close-modal').addEventListener('click', function() {
+                document.getElementById('illustration-modal').style.display = 'none';
+            });
+            
+            // Fechar modal ao clicar fora dele
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('illustration-modal');
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            // Esconder tooltip quando o mouse sai
+            document.querySelectorAll('.interactive-svg, .svg-container').forEach(el => {
+                el.addEventListener('mouseleave', hideTooltip);
+            });
+
+            // Navegação por scroll
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.3
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
